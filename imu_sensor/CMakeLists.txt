@@ -7,10 +7,19 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(rclcpp REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Trajectory.msg"
 )
+
+add_executable(imu_sensor_exe src/imu_sensor.cpp)
+rosidl_target_interfaces(imu_sensor_exe ${PROJECT_NAME} "rosidl_typesupport_cpp")
+ament_target_dependencies(imu_sensor_exe rclcpp)
+
+install(TARGETS
+  imu_sensor_exe
+  DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
