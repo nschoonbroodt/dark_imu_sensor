@@ -11,6 +11,8 @@ find_package(rclcpp REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Trajectory.msg"
+  "msg/RawIMUData.msg"
+  "msg/IMUData.msg"
 )
 
 add_executable(imu_sensor_exe src/imu_sensor.cpp)
