@@ -13,7 +13,7 @@ FakeTrajectoryPublisher::FakeTrajectoryPublisher() : Node("fake_trajectory") {
         auto message = imu_sensor::msg::Trajectory();
         publisher_->publish(message);
     };
-    timer_ = this->create_wall_timer(500ms, timer_callback);
+    timer_ = this->create_wall_timer(1ms, timer_callback);
 }
 
 int main(int argc, char * argv[]) {

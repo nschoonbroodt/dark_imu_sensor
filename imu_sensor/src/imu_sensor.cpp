@@ -6,11 +6,19 @@
 #include "imu_sensor.hpp"
 
 IMUSensor::IMUSensor() : Node("imu_sensor") {
-    auto topic_callback = [this](const imu_sensor::msg::Trajectory & trajectory) {
-        RCLCPP_INFO_STREAM(this->get_logger(), "I heard: '" << trajectory.timestamp << "'");
-    };
-    this->subscription_ = this->create_subscription<imu_sensor::msg::Trajectory>("topic", 10, topic_callback);
+    this->subscription_ = 
+        this->create_subscription<imu_sensor::msg::Trajectory>(
+            "topic",
+            10,
+            [this] (const imu_sensor::msg::Trajectory & trajectory) {
+                this->trajectory_callback(trajectory);
+            });
 };
+
+void IMUSensor::trajectory_callback(const imu_sensor::msg::Trajectory & trajectory) {
+    this->secondLastTrajectory_ = this->lastTrajectory_;
+    this->lastTrajectory_ = trajectory;
+}
 
 int main(int argc, char * argv[]) {
     rclcpp::init(argc, argv);
