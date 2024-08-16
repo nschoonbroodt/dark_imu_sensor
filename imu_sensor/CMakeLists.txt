@@ -17,8 +17,14 @@ add_executable(imu_sensor_exe src/imu_sensor.cpp)
 rosidl_target_interfaces(imu_sensor_exe ${PROJECT_NAME} "rosidl_typesupport_cpp")
 ament_target_dependencies(imu_sensor_exe rclcpp)
 
+add_executable(fake_trajectory src/fake_trajectory_publisher.cpp)
+rosidl_target_interfaces(fake_trajectory ${PROJECT_NAME} "rosidl_typesupport_cpp")
+ament_target_dependencies(fake_trajectory rclcpp)
+
+
 install(TARGETS
   imu_sensor_exe
+  fake_trajectory
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
