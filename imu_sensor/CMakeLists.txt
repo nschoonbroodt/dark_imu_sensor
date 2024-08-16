@@ -15,7 +15,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/IMUData.msg"
 )
 
-add_executable(imu_sensor_exe src/imu_sensor.cpp)
+add_executable(imu_sensor_exe src/imu_sensor.cpp src/traj_to_imu.cpp)
 rosidl_target_interfaces(imu_sensor_exe ${PROJECT_NAME} "rosidl_typesupport_cpp")
 ament_target_dependencies(imu_sensor_exe rclcpp)
 
