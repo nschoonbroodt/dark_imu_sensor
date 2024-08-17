@@ -13,6 +13,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Trajectory.msg"
   "msg/RawIMUData.msg"
   "msg/IMUData.msg"
+  "msg/IMUEnums.msg"
 )
 
 add_executable(imu_sensor_exe src/imu_sensor.cpp src/traj_to_imu.cpp)
