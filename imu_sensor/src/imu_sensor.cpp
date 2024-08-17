@@ -14,7 +14,7 @@ IMUSensor::IMUSensor() : Node("imu_sensor") {
     // Subscribe to trajectory to remember the last 2 points
     this->subscription_ = 
         this->create_subscription<imu_sensor::msg::Trajectory>(
-            "topic",
+            "trajectory",
             10,
             [this] (const imu_sensor::msg::Trajectory & trajectory) {
                 this->trajectory_callback(trajectory);

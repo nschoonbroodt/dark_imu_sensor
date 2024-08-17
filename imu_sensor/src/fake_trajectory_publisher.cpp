@@ -8,7 +8,7 @@
 using namespace std::chrono_literals;
 
 FakeTrajectoryPublisher::FakeTrajectoryPublisher() : Node("fake_trajectory") {
-    publisher_ = this->create_publisher<imu_sensor::msg::Trajectory>("topic", 10);
+    publisher_ = this->create_publisher<imu_sensor::msg::Trajectory>("trajectory", 10);
     auto timer_callback = [this]() {
         auto message = imu_sensor::msg::Trajectory();
         publisher_->publish(message);
