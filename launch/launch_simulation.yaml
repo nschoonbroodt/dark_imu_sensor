@@ -1,0 +1,11 @@
+launch:
+- node:
+    pkg: "imu_sensor"
+    exec: "fake_trajectory"
+    name: "trajectory"
+    namespace: "test_bench"
+- node:
+    pkg: "imu_sensor"
+    exec: "imu_sensor_exe"
+    name: "imu_sensor"
+    namespace: "test_bench"
