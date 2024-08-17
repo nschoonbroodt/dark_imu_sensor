@@ -1,5 +1,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "imu_sensor/msg/trajectory.hpp"
+#include "imu_sensor/msg/imu_data.hpp"
 
 #include <chrono>
 
@@ -20,9 +21,9 @@ private:
     std::chrono::milliseconds message_frequency_;
 
     void trajectory_callback(const imu_sensor::msg::Trajectory & trajectory);
-    void imu_message_send(auto message);
-    auto imu_compute_message();
-    auto imu_inject_failure(auto initial_message);
+    void imu_message_send(imu_sensor::msg::IMUData message);
+    imu_sensor::msg::IMUData imu_compute_message();
+    imu_sensor::msg::IMUData imu_inject_failure(imu_sensor::msg::IMUData initial_message);
 
     void create_task();
 

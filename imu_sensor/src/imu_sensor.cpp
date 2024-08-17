@@ -37,6 +37,11 @@ IMUSensor::IMUSensor() : Node("imu_sensor") {
     ros_or_bus_desc.description = "Sending data through ROS or to com bus";
     this->declare_parameter("message_destination", imu_sensor::msg::IMUEnums::IMU_TO_ROS, ros_or_bus_desc);
 
+    // Param 2: inject failure on status
+    this->declare_parameter("inject_status_failure", false);
+    // Param 3: inject random data without changing the status
+    this->declare_parameter("inject_random_data", false);
+
 
     // Param 4: sending data frequency
     // To react on parameter change
@@ -63,7 +68,7 @@ void IMUSensor::trajectory_callback(const imu_sensor::msg::Trajectory & trajecto
     this->lastTrajectory_ = trajectory;
 }
 
-auto IMUSensor::imu_compute_message() {
+imu_sensor::msg::IMUData IMUSensor::imu_compute_message() {
     auto rawMessage = traj_to_imu(this->lastTrajectory_, this->secondLastTrajectory_);
     auto message = imu_sensor::msg::IMUData();
     message.imu_data = rawMessage;
@@ -72,8 +77,13 @@ auto IMUSensor::imu_compute_message() {
     return message;
 }
 
-auto IMUSensor::imu_inject_failure(auto message) {
-    // TODO
+imu_sensor::msg::IMUData IMUSensor::imu_inject_failure(imu_sensor::msg::IMUData message) {
+    if (this->get_parameter("inject_status_failure").as_bool()) {
+        message.status = imu_sensor::msg::IMUEnums::IMU_FAIL;
+    }
+    if (this->get_parameter("inject_random_data").as_bool()) {
+        message.imu_data.acceleration[1] = 42;
+    }
     return message;
 }
 
@@ -87,7 +97,7 @@ void IMUSensor::create_task() {
 }
 
 
-void IMUSensor::imu_message_send(auto message) {
+void IMUSensor::imu_message_send(imu_sensor::msg::IMUData message) {
     if (this->get_parameter("message_destination").as_int() == imu_sensor::msg::IMUEnums::IMU_TO_ROS) {
         this->publisher_->publish(message);
     } else {
