@@ -27,8 +27,8 @@ IMUSensor::IMUSensor() : Node("imu_sensor") {
     // declare parameters
     // To react on parameter change
     param_subscriber_ = std::make_shared<rclcpp::ParameterEventHandler>(this);
-    
-    // TODO: I have 10ms hardcoded in 2 places! With 2 different units
+
+    // On new period parameter subscription, change the timer frequency    
     auto periodCb = [this](const rclcpp::Parameter &period) {
         std::chrono::milliseconds new_period = period.as_int() * 1ms;
         if (this->message_frequency_ == new_period) {
