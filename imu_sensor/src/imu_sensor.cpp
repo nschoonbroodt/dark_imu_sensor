@@ -51,23 +51,34 @@ IMUSensor::IMUSensor() : Node("imu_sensor") {
 
 };
 
-void IMUSensor::create_task() {
-    RCLCPP_INFO(this->get_logger(), "Create timer with period %d ms", (int)message_frequency_.count());
-    timer_ = this->create_wall_timer(message_frequency_, [this]() {
-        this->imu_message_send();
-    });
-}
-
 void IMUSensor::trajectory_callback(const imu_sensor::msg::Trajectory & trajectory) {
     this->secondLastTrajectory_ = this->lastTrajectory_;
     this->lastTrajectory_ = trajectory;
 }
 
-void IMUSensor::imu_message_send() {
+auto IMUSensor::imu_compute_message() {
     auto rawMessage = traj_to_imu(this->lastTrajectory_, this->secondLastTrajectory_);
     auto message = imu_sensor::msg::IMUData();
     message.imu_data = rawMessage;
+    return message;
+}
 
+auto IMUSensor::imu_inject_failure(auto message) {
+    // TODO
+    return message;
+}
+
+void IMUSensor::create_task() {
+    RCLCPP_INFO(this->get_logger(), "Create timer with period %d ms", (int)message_frequency_.count());
+    timer_ = this->create_wall_timer(message_frequency_, [this]() {
+        auto message = this->imu_compute_message();
+        auto messageWithFailures = this->imu_inject_failure(message);
+        this->imu_message_send(messageWithFailures);
+    });
+}
+
+
+void IMUSensor::imu_message_send(auto message) {
     if (this->get_parameter("message_destination").as_int() == imu_sensor::msg::IMUEnums::IMU_TO_ROS) {
         this->publisher_->publish(message);
     } else {

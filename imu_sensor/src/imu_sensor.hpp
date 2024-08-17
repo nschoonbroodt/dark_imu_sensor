@@ -20,7 +20,9 @@ private:
     std::chrono::milliseconds message_frequency_;
 
     void trajectory_callback(const imu_sensor::msg::Trajectory & trajectory);
-    void imu_message_send();
+    void imu_message_send(auto message);
+    auto imu_compute_message();
+    auto imu_inject_failure(auto initial_message);
 
     void create_task();
 
