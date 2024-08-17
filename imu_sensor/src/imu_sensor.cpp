@@ -11,6 +11,7 @@
 using namespace std::chrono_literals;
 
 IMUSensor::IMUSensor() : Node("imu_sensor") {
+
     // Subscribe to trajectory to remember the last 2 points
     this->subscription_ = 
         this->create_subscription<imu_sensor::msg::Trajectory>(
@@ -20,7 +21,7 @@ IMUSensor::IMUSensor() : Node("imu_sensor") {
                 this->trajectory_callback(trajectory);
             });
     
-    // Register a timer (for the moment at constant speed) to publish the IMU Data
+    // Create a publisher to publish data to ros network
     publisher_ = this->create_publisher<imu_sensor::msg::IMUData>("imu_data", 10);
 
     // declare parameters
