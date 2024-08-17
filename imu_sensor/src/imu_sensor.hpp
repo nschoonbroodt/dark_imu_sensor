@@ -22,6 +22,6 @@ private:
     void trajectory_callback(const imu_sensor::msg::Trajectory & trajectory);
     void imu_message_send();
 
-    void create_timer();
+    void create_task();
 
 };

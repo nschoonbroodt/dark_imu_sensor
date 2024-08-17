@@ -22,17 +22,11 @@ IMUSensor::IMUSensor() : Node("imu_sensor") {
     
     // Register a timer (for the moment at constant speed) to publish the IMU Data
     publisher_ = this->create_publisher<imu_sensor::msg::IMUData>("imu_data", 10);
-    this->create_timer();
 
     // declare parameters
     // To react on parameter change
     param_subscriber_ = std::make_shared<rclcpp::ParameterEventHandler>(this);
     
-    // Period of message sending
-    auto param_desc = rcl_interfaces::msg::ParameterDescriptor{};
-    param_desc.description = "The period between two IMU Sensor message, in ms";
-    this->declare_parameter("imu_message_period", 10, param_desc);
-    this->message_frequency_ = 10 * 1ms;
     // TODO: I have 10ms hardcoded in 2 places! With 2 different units
     auto periodCb = [this](const rclcpp::Parameter &period) {
         std::chrono::milliseconds new_period = period.as_int() * 1ms;
@@ -40,14 +34,21 @@ IMUSensor::IMUSensor() : Node("imu_sensor") {
             return; // no changes
         }
         this->message_frequency_ = new_period;
-        this->create_timer();
+        this->create_task();
         // TODO: maybe check allowed timer values
     };
     this->cb_handle_ = param_subscriber_->add_parameter_callback("imu_message_period", periodCb);
+
+        // declaring the parameter will automatically call the callback (possibly with the configuration value) if done after
+    auto param_desc = rcl_interfaces::msg::ParameterDescriptor{};
+    param_desc.description = "The period between two IMU Sensor message, in ms";
+    this->declare_parameter("imu_message_period", 10, param_desc);
+
 };
 
-void IMUSensor::create_timer() {
-    timer_ = this->create_wall_timer(message_frequency_, [this]() {
+void IMUSensor::create_task() {
+    RCLCPP_INFO(this->get_logger(), "Create timer with period %d ms", (int)message_frequency_.count());
+    timer_ = this->create_timer(message_frequency_, [this]() {
         this->imu_message_send();
     });
 }
