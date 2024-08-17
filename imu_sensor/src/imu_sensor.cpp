@@ -38,9 +38,6 @@ IMUSensor::IMUSensor() : Node("imu_sensor") {
     // On new period parameter subscription, change the timer frequency    
     auto periodCb = [this](const rclcpp::Parameter &period) {
         std::chrono::milliseconds new_period = period.as_int() * 1ms;
-        if (this->message_frequency_ == new_period) {
-            return; // no changes
-        }
         this->message_frequency_ = new_period;
         this->create_task();
         // TODO: maybe check allowed timer values
@@ -56,7 +53,7 @@ IMUSensor::IMUSensor() : Node("imu_sensor") {
 
 void IMUSensor::create_task() {
     RCLCPP_INFO(this->get_logger(), "Create timer with period %d ms", (int)message_frequency_.count());
-    timer_ = this->create_timer(message_frequency_, [this]() {
+    timer_ = this->create_wall_timer(message_frequency_, [this]() {
         this->imu_message_send();
     });
 }
@@ -71,7 +68,17 @@ void IMUSensor::imu_message_send() {
     auto message = imu_sensor::msg::IMUData();
     message.imu_data = rawMessage;
 
-    this->publisher_->publish(message);
+    if (this->get_parameter("message_destination").as_int() == imu_sensor::msg::IMUEnums::IMU_TO_ROS) {
+        this->publisher_->publish(message);
+    } else {
+        // This is done to "fake" sending to hardware bus... only logging on console
+        // A design choice could be to have some class that would be able to "write" message, with one writing on ROS, another on HW Bus, with the same interface
+        static int x = 0;
+        if (x%10 == 0) {
+            RCLCPP_INFO(this->get_logger(), "Write message to hardware bus");
+        }
+        x++;
+    }
 }
 
 int main(int argc, char * argv[]) {
